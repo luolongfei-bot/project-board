@@ -886,9 +886,19 @@ function openRecoveryModal() {
     
     const serverInfoEl = document.getElementById('rec-server-info');
     serverInfoEl.textContent = '正在连接服务器...';
-    fetch(API_URL).then(res => res.json()).then(serverData => {
+    
+    // Determine fetch source based on config
+    let fetchPromise;
+    if (currentCloudConfig) {
+        fetchPromise = fetchFromCloud().then(d => d); // Wrap to match structure if needed, but fetchFromCloud returns data directly
+    } else {
+        fetchPromise = fetch(LOCAL_API_URL).then(res => res.json());
+    }
+
+    fetchPromise.then(serverData => {
+        if (!serverData) throw new Error('No data');
         const count = serverData.tasks ? serverData.tasks.length : 0;
-        serverInfoEl.textContent = `项目: ${serverData.project.name} | 任务数: ${count}`;
+        serverInfoEl.textContent = `项目: ${serverData.project ? serverData.project.name : '未知'} | 任务数: ${count}`;
     }).catch(() => {
         serverInfoEl.textContent = '无法连接服务器';
     });
@@ -917,10 +927,24 @@ async function restoreFrom(source) {
     
     try {
         if (source === 'server') {
-            const res = await fetch(API_URL);
-            const serverData = await res.json();
-            data = serverData;
-            alert('已从服务器加载数据！');
+            // Use LOCAL_API_URL for local server fallback, or Cloud fetch
+            if (currentCloudConfig) {
+                const cloudData = await fetchFromCloud();
+                if (cloudData) {
+                    data = cloudData;
+                    alert('已从云端服务器加载数据！');
+                } else {
+                    throw new Error('云端没有数据或连接失败');
+                }
+            } else if (useServer) {
+                const res = await fetch(LOCAL_API_URL);
+                const serverData = await res.json();
+                data = serverData;
+                alert('已从本地服务器加载数据！');
+            } else {
+                alert('未连接任何服务器');
+                return;
+            }
         } else if (source === 'v3') {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
