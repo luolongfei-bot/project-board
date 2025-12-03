@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Flow - 项目管理看板</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.css">
+    <link rel="stylesheet" href="project_board.css">
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+</head>
+<body>
+
+<div class="project-app">
+    <header class="header">
+        <div class="header-left">
+            <h1 class="project-title-wrapper">
+                <span id="projectNameDisplay">🚀 Project Flow</span>
+                <button id="editProjectNameBtn" class="icon-btn" title="修改项目名称">✎</button>
+            </h1>
+            <div class="project-info">
+                <span id="projectTimeRange" class="time-badge">项目规划</span>
+                <div id="connectionStatus" class="status-badge" style="margin-left: 15px; font-size: 0.9rem; padding: 4px 8px; border-radius: 4px; background-color: rgb(248, 249, 250); color: rgb(108, 117, 125);" title="数据仅保存在您的浏览器中">⚪ 本地单机模式</div>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="forceSyncBtn" class="btn-secondary" title="将当前界面数据强制覆盖到服务器" style="display: none;">☁️ 强制同步</button>
+            <button class="btn-secondary">♻️ 找回数据</button>
+            <div class="view-switcher">
+                <button id="viewBoardBtn" class="btn-secondary active">📋 交付看板</button>
+                <button id="viewGanttBtn" class="btn-secondary">📊 全局甘特图</button>
+            </div>
+            <div class="divider-v"></div>
+            <button id="cloudConfigBtn" class="btn-secondary">☁️ 云端配置</button>
+            <button id="manageParentsBtn" class="btn-secondary">📁 管理项目模块</button>
+            <button id="addModuleBtn" class="btn-primary">➕ 添加核心功能</button>
+            <button id="exportBtn" class="btn-secondary">💾 导出</button>
+        </div>
+    </header>
+
+    <div class="app-body">
+        <!-- Board View: Groups (Projects) -> Columns (Core Modules) -->
+        <div id="boardContainer" class="board-container">
+            <!-- Module Groups will be rendered here -->
+        </div>
+
+        <!-- Gantt View -->
+        <div id="ganttContainer" class="gantt-container" style="display: none;">
+            <div class="gantt-toolbar">
+                <div class="gantt-modes">
+                    <button class="btn-secondary small" onclick="changeGanttMode('Day')">日</button>
+                    <button class="btn-secondary small" onclick="changeGanttMode('Week')">周</button>
+                    <button class="btn-secondary small" onclick="changeGanttMode('Month')">月</button>
+                </div>
+                <div style="font-size:0.9rem;color:var(--muted);">
+                    * 视图：项目模块 > 核心功能 > 任务
+                </div>
+            </div>
+            <div class="gantt-wrapper">
+                <svg id="gantt"></svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cloud Config Modal -->
+<div id="cloudConfigModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>☁️ 云端数据源配置</h2>
+            <button class="close-modal icon-btn">×</button>
+        </div>
+        <div class="modal-body">
+            <p style="color:#666; font-size:0.9rem; margin-bottom:15px;">
+                配置云端存储后，数据将保存在互联网上。您可以将此网页发送给任何人，他们输入相同的配置即可协作，无需您一直开机。
+                <br>推荐使用 <a href="https://jsonbin.io" target="_blank">JSONBin.io</a> (免费/稳定)。
+            </p>
+            <div class="form-group">
+                <label>云端服务类型</label>
+                <select id="cloudServiceType">
+                    <option value="jsonbin">JSONBin.io (推荐)</option>
+                    <option value="custom">自定义 API</option>
+                </select>
+            </div>
+            
+                <div id="jsonbinConfig">
+                    <div class="form-group">
+                        <label>Bin ID (数据桶ID)</label>
+                        <input type="text" id="cloudBinId" placeholder="例如: 656a1b..." value="692ff62eae596e708f804387">
+                        <small style="color:#888;">在 JSONBin 创建一个 Bin 后获取</small>
+                    </div>
+                    <div class="form-group">
+                        <label>API Key (Master/Access Key)</label>
+                        <input type="password" id="cloudApiKey" placeholder="例如: $2a$10$..." value="$2a$10$6XjqsiDTFWsfHa5EnTtgWuuLPhUikpZ.P4y3qIWyDS69ajtAcfJWO">
+                        <small style="color:#888;">用于验证读写权限</small>
+                    </div>
+                </div>
+
+            <div id="customConfig" style="display:none;">
+                <div class="form-group">
+                    <label>API 地址 (URL)</label>
+                    <input type="text" id="cloudCustomUrl" placeholder="https://...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>当前状态</label>
+                <div id="cloudStatusDisplay" style="padding:8px; background:#f5f5f5; border-radius:4px;">🔴 未配置 (使用本地数据)</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="testCloudBtn" class="btn-secondary">测试连接</button>
+            <button id="saveCloudBtn" class="btn-primary">保存并切换</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Project Name Edit -->
+<div id="projectNameModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content small">
+        <div class="modal-header">
+            <h2>修改项目名称</h2>
+            <button class="close-modal icon-btn">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>项目名称</label>
+                <input type="text" id="editProjectNameInput" placeholder="输入新的项目名称">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="saveProjectNameBtn" class="btn-primary">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Task Edit -->
+<div id="taskModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">编辑任务</h2>
+            <button class="close-modal icon-btn">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>任务内容</label>
+                <textarea id="taskContent" rows="3" placeholder="描述任务详情..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>所属核心功能模块</label>
+                    <select id="taskModuleSelect"></select>
+                </div>
+                <div class="form-group">
+                    <label>工时 (天)</label>
+                    <input type="number" id="taskDuration" min="0.5" step="0.5" value="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <input type="date" id="taskStartDate">
+                </div>
+                <div class="form-group">
+                    <label>截止时间</label>
+                    <input type="date" id="taskEndDate">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>前置依赖 (阻塞项)</label>
+                <select id="taskDependencies" multiple class="multi-select">
+                    <!-- Options populated dynamically -->
+                </select>
+                <div class="help-text">按住 Ctrl/Cmd 多选。前置任务未完成时，此任务将被锁定。</div>
+            </div>
+            <div class="form-group">
+                <label>状态</label>
+                <div class="status-radios">
+                    <label><input type="radio" name="taskStatus" value="pending" checked> 待处理</label>
+                    <label><input type="radio" name="taskStatus" value="doing"> 进行中</label>
+                    <label><input type="radio" name="taskStatus" value="done"> 已完成</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="deleteTaskBtn" class="btn-danger left">删除任务</button>
+            <button id="saveTaskBtn" class="btn-primary">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Core Module (Sub-set) Edit -->
+<div id="moduleModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content small">
+        <div class="modal-header">
+            <h2 id="moduleModalTitle">编辑核心功能模块</h2>
+            <button class="close-modal icon-btn">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>所属项目模块 (父级)</label>
+                <select id="moduleParentSelect"></select>
+            </div>
+            <div class="form-group">
+                <label>核心功能名称</label>
+                <input type="text" id="moduleName" placeholder="例如：用户登录、支付接口...">
+            </div>
+            <div class="form-group">
+                <label>标识颜色</label>
+                <input type="color" id="moduleColor" value="#5bc17f" style="width:100%;height:40px;">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>交付开始</label>
+                    <input type="date" id="moduleStartDate">
+                </div>
+                <div class="form-group">
+                    <label>交付截止</label>
+                    <input type="date" id="moduleEndDate">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="deleteModuleBtn" class="btn-danger left" style="display:none;">删除模块</button>
+            <button id="saveModuleBtn" class="btn-primary">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Parent Project Module Management -->
+<div id="parentModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content small">
+        <div class="modal-header">
+            <h2>管理项目模块 (大类)</h2>
+            <button class="close-modal icon-btn">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="input-group">
+                <input type="text" id="newParentName" placeholder="新项目模块名称...">
+                <button id="addParentBtn" class="btn-primary">添加</button>
+            </div>
+            <div id="parentList" class="item-list">
+                <!-- Parent Modules List -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="project_board.js"></script>
+</body>
+</html>

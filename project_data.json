@@ -1,0 +1,239 @@
+{
+  "project": {
+    "name": "关键节点flow"
+  },
+  "modules": [
+    {
+      "id": "1764583687011",
+      "name": "S13赛季玩法终局",
+      "color": "#218343",
+      "startDate": "2025-12-01",
+      "endDate": "2026-01-09",
+      "parentId": "pm_default"
+    },
+    {
+      "id": "1764584488915",
+      "name": "S13赛季玩法-异界",
+      "color": "#8ac15c",
+      "startDate": "2025-12-01",
+      "endDate": "2026-01-09",
+      "parentId": "pm_default"
+    },
+    {
+      "id": "1764584620826",
+      "name": "S13赛季玩法-打牌",
+      "color": "#42c26f",
+      "startDate": "2025-12-01",
+      "endDate": "2026-01-09",
+      "parentId": "pm_default"
+    },
+    {
+      "id": "1764584858712",
+      "name": "S13赛季玩法-整体流程正式化",
+      "color": "#5bc17f",
+      "startDate": "2025-12-01",
+      "endDate": "2026-01-09",
+      "parentId": "pm_default"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "1764583869300",
+      "content": "数值相对完全正式化",
+      "moduleId": "1764583687011",
+      "duration": "1",
+      "startDate": "",
+      "endDate": "2025-12-01",
+      "status": "done",
+      "dependencies": []
+    },
+    {
+      "id": "1764583891985",
+      "content": "战斗体验相对完全正式化",
+      "moduleId": "1764583687011",
+      "duration": "1",
+      "startDate": "2025-12-02",
+      "endDate": "2025-12-02",
+      "status": "done",
+      "dependencies": []
+    },
+    {
+      "id": "1764583931015",
+      "content": "流程体验相对完全正式化",
+      "moduleId": "1764583687011",
+      "duration": "1",
+      "startDate": "2025-12-03",
+      "endDate": "2025-12-04",
+      "status": "pending",
+      "dependencies": [
+        "1764583869300",
+        "1764583891985"
+      ]
+    },
+    {
+      "id": "1764584530494",
+      "content": "异界-战斗体验正式化及验收",
+      "moduleId": "1764584488915",
+      "duration": "1",
+      "startDate": "",
+      "endDate": "2025-12-05",
+      "status": "doing",
+      "dependencies": []
+    },
+    {
+      "id": "1764584562933",
+      "content": "异界-掉落正式化",
+      "moduleId": "1764584488915",
+      "duration": "1",
+      "startDate": "",
+      "endDate": "2025-12-05",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764584675440",
+      "content": "数值平衡性调整初版",
+      "moduleId": "1764584620826",
+      "duration": "2.5",
+      "startDate": "2025-12-01",
+      "endDate": "2025-12-03",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764584724781",
+      "content": "数值平衡性正式版1",
+      "moduleId": "1764584620826",
+      "duration": "2",
+      "startDate": "2025-12-04",
+      "endDate": "2025-12-05",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764584967240",
+      "content": "初版可体验流程",
+      "moduleId": "1764584858712",
+      "duration": "0",
+      "startDate": "",
+      "endDate": "2025-12-05",
+      "status": "pending",
+      "dependencies": [
+        "1764583869300",
+        "1764583891985",
+        "1764583931015",
+        "1764584530494",
+        "1764584562933",
+        "1764584675440"
+      ]
+    },
+    {
+      "id": "1764585065701",
+      "content": "基本正式数值体验版",
+      "moduleId": "1764584620826",
+      "duration": "1",
+      "startDate": "2025-12-08",
+      "endDate": "2025-12-12",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764585153120",
+      "content": "公司体验",
+      "moduleId": "1764584858712",
+      "duration": "1",
+      "startDate": "2025-12-08",
+      "endDate": "2025-12-12",
+      "status": "pending",
+      "dependencies": [
+        "1764584967240"
+      ]
+    },
+    {
+      "id": "1764585233265",
+      "content": "打牌体验调整",
+      "moduleId": "1764584620826",
+      "duration": "1",
+      "startDate": "2025-12-15",
+      "endDate": "2025-12-19",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764585282446",
+      "content": "打牌终版（仅修BUG及小调整）",
+      "moduleId": "1764584620826",
+      "duration": "1",
+      "startDate": "2025-12-22",
+      "endDate": "2025-12-26",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764585334906",
+      "content": "打牌正式版",
+      "moduleId": "1764584620826",
+      "duration": "1",
+      "startDate": "2025-12-29",
+      "endDate": "2026-01-02",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764585382651",
+      "content": "打牌修bug冗余",
+      "moduleId": "1764584620826",
+      "duration": "1",
+      "startDate": "2026-01-05",
+      "endDate": "2026-01-09",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764585685123",
+      "content": "异界-特效整体优化",
+      "moduleId": "1764584488915",
+      "duration": "1",
+      "startDate": "2025-12-10",
+      "endDate": "2025-12-12",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764585730129",
+      "content": "终局-特效优化",
+      "moduleId": "1764583687011",
+      "duration": "1",
+      "startDate": "2025-12-10",
+      "endDate": "2025-12-12",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764585763080",
+      "content": "特殊边界处理（非正常流程）",
+      "moduleId": "1764583687011",
+      "duration": "1",
+      "startDate": "",
+      "endDate": "",
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "1764585898566",
+      "content": "终局-体验细节优化",
+      "moduleId": "1764583687011",
+      "duration": "5",
+      "startDate": "2025-12-08",
+      "endDate": "2025-12-12",
+      "status": "pending",
+      "dependencies": []
+    }
+  ],
+  "parentModules": [
+    {
+      "id": "pm_default",
+      "name": "S13赛季玩法"
+    }
+  ]
+}
